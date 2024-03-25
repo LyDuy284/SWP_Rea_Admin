@@ -7,6 +7,7 @@ interface Transfer {
   title: string;
   content: string;
   reason: string;
+  tranferFormStatus: 0,
   transferImages: string[];
   transactionImages: string[];
   

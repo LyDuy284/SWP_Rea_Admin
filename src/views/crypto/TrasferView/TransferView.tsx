@@ -203,15 +203,16 @@ const TransferView = () => {
                 </button>
               </div>
               <div className='flex justify-evenly' >
-                <div className='flex justify-evenly w-1/3'>
+                <div className='flex justify-evenly w-1/4'>
                   <button onClick={makeVNPAYApiCall} className="mr-8 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4">
-                    VNPAY API
+                    VNPAY
                   </button>
                   <form onSubmit={uploadImages} encType="multipart/form-data">
-                    <input type="file" onChange={(e) => setFileInput(e.target)} />
-                    <button type="submit" className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4">
+                    
+                    <button type="submit" className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded mt-4">
                       Upload Image
                     </button>
+                    <input type="file" onChange={(e) => setFileInput(e.target)} />
                   </form>
                 </div>
               </div>

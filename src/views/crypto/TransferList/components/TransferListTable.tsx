@@ -9,6 +9,7 @@ interface Transfer {
   title: string;
   content: string;
   reason: string;
+  tranferFormStatus: 0,
   transferImages: string[];
   transactionImages: string[];
   
@@ -69,13 +70,19 @@ const TransferListTable = () => {
         },
       },
       {
-        header: 'Li do',
+        header: 'Lý do',
         cell: (props) => {
           const row = props.row.original;
           return row.reason || '--';
         },
       },
-      
+      {
+        header: 'Trạng thái',
+        cell: (props) => {
+          const row = props.row.original;
+          return row.tranferFormStatus || '--';
+        },
+      },
       {
         header: 'Xem chi tiết',
         cell: (props) => {
