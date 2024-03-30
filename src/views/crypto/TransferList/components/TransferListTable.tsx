@@ -25,13 +25,10 @@ const TransferListTable = () => {
   }, []);
 
   const fetchData = async () => {
-    try {
-      const transferData = await apiGetTransferList();
-      setTransfers(transferData);
-    } catch (error) {
-      console.error('Error fetching transfer data:', error);
-    }
-  };
+    const { data } = await apiGetTransferList<any, any>({})
+
+    setTransfers(data.result)
+  }
 
   const onView = (id: number) => {
     navigate(`/app/transfer-view/${id}`);

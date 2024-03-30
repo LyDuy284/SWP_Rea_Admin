@@ -7,29 +7,78 @@ import useThemeClass from '@/utils/hooks/useThemeClass';
 import axios from 'axios';
 
 
+
 // Define the TransferView component
 const TransferView = () => {
   // Get the 'id' parameter from the URL
   const { id } = useParams<{ id: string }>();
-
-  // Define state variables for transfer data and loading status
-  const [transfer, setTransfer] = useState<any>(); // Adjust the type according to the response structure
+  const [transfer, setTransfer] = useState<any>();
   const [loading, setLoading] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
   const [notification, setNotification] = useState<{ message: string, success: boolean } | null>(null);
   const [showRejectPopup, setShowRejectPopup] = useState(false);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [fileInput, setFileInput] = useState<any>(null);
-  // Custom hook to manage theme class
   const { textTheme } = useThemeClass();
+  const [userId, setUserId] = useState<number | null>(null);
+  const [propertyPrice, setPropertyPrice] = useState<number | null>(null);
+  const [vnpayUrl, setVnpayUrl] = useState<string | null>(null);
+
 
   // Fetch transfer details when the component mounts or 'id' changes
   useEffect(() => {
     // Check if 'id' is available
     if (!id) return;
-    fetchTransferDetails(); // Call the fetchTransferDetails function
+    fetchTransferDetails();
+    fetchUserId();
+    fetchPropertyPrice(); // Call the fetchTransferDetails function
   }, [id]);
 
+  const fetchUserIdFromAPI = async () => {
+    try {
+      const response = await axios.get('API_ENDPOINT_TO_GET_USER_ID');
+      if (response.data && response.data.userId) {
+        setUserId(response.data.userId);
+      } else {
+        console.error('User ID not found in API response');
+      }
+    } catch (error) {
+      console.error('Error fetching user ID:', error);
+    }
+  };
+
+  // Call fetchUserIdFromAPI when component mounts
+  useEffect(() => {
+    fetchUserIdFromAPI();
+  }, []);
+
+  useEffect(() => {
+    if (transfer) {
+      const price = transfer?.property?.price;
+      if (price) {
+        const calculatedAmount = price * 0.1;
+        makeVNPAYApiCall(calculatedAmount);
+      }
+    }
+  }, [transfer]);
+  const fetchUserId = () => {
+    // Set userId when the user logs in
+    const loggedInUserId = 123; // Replace with the actual logged-in user ID
+    setUserId(loggedInUserId);
+  };
+  const fetchPropertyPrice = async () => {
+    try {
+      // Fetch property price from your API
+      const response = await axios.get('API_ENDPOINT_TO_GET_PROPERTY_PRICE');
+      if (response.data && response.data.price) {
+        setPropertyPrice(response.data.price);
+      } else {
+        console.error('Property price not found in API response');
+      }
+    } catch (error) {
+      console.error('Error fetching property price:', error);
+    }
+  };
   const fetchTransferDetails = async () => {
     try {
       setLoading(true); // Set loading to true
@@ -80,27 +129,52 @@ const TransferView = () => {
     }
   };
 
-  const makeVNPAYApiCall = async () => {
+
+
+  const calculateAmount = () => {
+    if (propertyPrice !== null) {
+      return propertyPrice * 0.1; // Calculate 10% of the property price
+    }
+    return null;
+  };
+  const makeVNPAYApiCall = async (amount: number) => {
     try {
-      // Make API call to VNPAY endpoint
-      const response = await fetch('https://reaauction.azurewebsites.net/v1/auction/VNPay');
-      if (response.ok) {
-        // Process response if successful
-        const data = await response.json();
-        console.log('VNPAY API Response:', data);
-        // Handle data as needed
+      setLoading(true);
+      if (userId !== null && amount !== null) {
+        const response = await axios.get('https://reaauction.azurewebsites.net/v1/auction/VNPay', {
+          params: {
+            userId: userId,
+            amount: amount
+          }
+        });
+        if (response.status === 200) {
+          const vnpayUrlFromAPI = response.data.result;
+
+          setVnpayUrl(vnpayUrlFromAPI);
+
+        } else {
+          console.error('Failed to fetch VNPAY URL. Unexpected status:', response.status);
+        }
       } else {
-        // Handle errors if response is not okay
-        console.error('VNPAY API Error:', response.status);
+        console.error('User ID or amount is null');
       }
     } catch (error) {
       console.error('Error making VNPAY API call:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
+  const handleButtonClick = () => {
+    if (vnpayUrl) {
+      window.location.href = vnpayUrl;
+    } else {
+      console.error('VNPAY URL is not available');
+    }
+  };
   const uploadImages = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault(); // Prevent the default form submission behavior
-    
+
     try {
       setLoading(true);
       const formData = new FormData();
@@ -108,7 +182,7 @@ const TransferView = () => {
         formData.append('files', fileInput.files[i]);
       }
       const headers = {
-        Authorization: `Bearer ${"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6ImFkbWluIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiQWRtaW4iLCJleHAiOjE3MTE0NTA2NjMsImlzcyI6Imh0dHBzOi8vbG9jYWxob3N0OjcyMzciLCJhdWQiOiJodHRwczovL2xvY2FsaG9zdDo1MDAwIn0.NEdW4SPHAL8rFt91Fhd8rBlPFWbEJGUra05HrO7I1bg"}`, // Replace "your_access_token" with your actual access token
+        Authorization: `Bearer ${"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6ImFkbWluIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiQWRtaW4iLCJleHAiOjE3MTE4NTk2NDIsImlzcyI6Imh0dHBzOi8vbG9jYWxob3N0OjcyMzciLCJhdWQiOiJodHRwczovL2xvY2FsaG9zdDo1MDAwIn0.Ys_kktCMNKwLRwzihoJnEKs_xnFBAE2DqrrHnKF3Df0"}`, // Replace "your_access_token" with your actual access token
       };
       const response = await fetch('https://reaauction.azurewebsites.net/v1/auction/storage/upload/multiple-files', {
         method: 'POST',
@@ -121,12 +195,12 @@ const TransferView = () => {
         const url = {
           transactionImages: data.result
         }
-        const res = await axios.put(`https://reaauction.azurewebsites.net/v1/auction/TransferForm/member/${id}`, url, {
-            headers: headers,
-          });
-        
+        const res = await axios.put(`https://reaauction.azurewebsites.net/v1/auction/TransferForm/admin/${id}`, url, {
+          headers: headers,
+        });
+
         console.log(res);
-        
+
         // Handle the response as needed
         setNotification({ message: 'Images uploaded successfully', success: true });
       } else {
@@ -139,7 +213,7 @@ const TransferView = () => {
       setLoading(false);
     }
   };
-  
+
   // Render the TransferView component
   return (
     <div className="w-full">
@@ -171,6 +245,9 @@ const TransferView = () => {
               </h6>
               <h6>
                 Nội dung: <span className="opacity-80">{transfer.content}</span>
+              </h6>
+              <h6>
+                Price: <span className="opacity-80">{transfer.property.price}</span>
               </h6>
               {showRejectPopup && (
                 <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-900 bg-opacity-50">
@@ -204,11 +281,12 @@ const TransferView = () => {
               </div>
               <div className='flex justify-evenly' >
                 <div className='flex justify-evenly w-1/4'>
-                  <button onClick={makeVNPAYApiCall} className="mr-8 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4">
-                    VNPAY
+
+                  <button onClick={handleButtonClick} className="mr-8 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4">
+                    {loading ? 'Loading...' : vnpayUrl ? 'Go to VNPAY' : 'Get VNPAY URL'}
                   </button>
                   <form onSubmit={uploadImages} encType="multipart/form-data">
-                    
+
                     <button type="submit" className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded mt-4">
                       Upload Image
                     </button>
@@ -216,13 +294,13 @@ const TransferView = () => {
                   </form>
                 </div>
               </div>
-              
+
               {notification && (
                 <div className={`mt-4 text-center ${notification.success ? 'text-green-600' : 'text-red-600'}`}>
                   {notification.message}
                 </div>
               )}
-              {/* Add more details as needed */}
+
             </div>
           </div>
         )}

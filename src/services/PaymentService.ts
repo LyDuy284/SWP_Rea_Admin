@@ -1,10 +1,10 @@
 import ApiService from "./ApiService";
 
-export async function apiGetTransferList<T, U extends Record<string, unknown>>(
+export async function apiGetPaymentList<T, U extends Record<string, unknown>>(
     params: U
   ) {
     return ApiService.fetchData<T>({
-      url: '/TransferForm/all',
+      url: '/payment/all',
       method: 'get',
       params: { ...params, pageSize: params.size },
     })

@@ -79,6 +79,18 @@ const appsRoute: Routes = [
     authority: [],
   },
   {
+    key: 'apps.payment',
+    path: `${APP_PREFIX_PATH}/payment`,
+    component: lazy(() => import('@/views/crypto/PaymentList')),
+    authority: [],
+  },
+  {
+    key: 'apps.auctionhistory',
+    path: `${APP_PREFIX_PATH}/auctionhistory`,
+    component: lazy(() => import('@/views/crypto/AuctionHistory')),
+    authority: [],
+  },
+  {
     key: 'apps.settings',
     path: `${APP_PREFIX_PATH}/account/settings/:tab`,
     component: lazy(() => import('@/views/account/Settings')),
