@@ -47,6 +47,11 @@ const SignInForm = (props: SignInFormProps) => {
     setSubmitting: (isSubmitting: boolean) => void
   ) => {
     const { username, password } = values
+    if(username !== 'admin') {
+      setMessage('Only admin users are allowed to sign in.');
+      setSubmitting(false);
+      return;
+    }
     setSubmitting(true)
     const result = await signIn({ username, password })
     if (result?.status === 'failed') {

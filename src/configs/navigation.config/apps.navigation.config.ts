@@ -69,7 +69,7 @@ const appsNavigationConfig: NavigationTree[] = [
       {
         key: 'apps.payment',
         path: `${APP_PREFIX_PATH}/payment`,
-        title: 'Payment',
+        title: 'Thanh Toán',
         translateKey: 'Payment',
         icon: 'transfer',
         type: NAV_ITEM_TYPE_ITEM,
@@ -79,7 +79,7 @@ const appsNavigationConfig: NavigationTree[] = [
       {
         key: 'apps.auctionhistory',
         path: `${APP_PREFIX_PATH}/auctionhistory`,
-        title: 'AuctionHistory',
+        title: 'Lịch sử đấu giá',
         translateKey: 'Auction History',
         icon: 'aution',
         type: NAV_ITEM_TYPE_ITEM,

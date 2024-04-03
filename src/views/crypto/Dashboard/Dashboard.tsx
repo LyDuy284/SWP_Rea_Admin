@@ -8,6 +8,16 @@ import { NumericFormat } from 'react-number-format'
 import TopProduct from './TopProduct'
 import { apiGetAuctionState } from '@/services/AuctionStatusService'
 import { apiGetUserByMonth } from '@/services/ApiUserMonth'
+import { apiGetTransactionState } from '@/services/TransactionService'
+import { apiGetBiddingState } from '@/services/BidingService'
+
+interface TransactionData {
+  month: string;
+  numberOfTransaction: number;
+  numberOfUsers: number;
+  totalAuction: number;
+  totalTransactionAmount: number;
+}
 
 function countPostsByMonth(posts: any, range: any) {
   const postCounts: any = {}
@@ -49,6 +59,7 @@ const data = {
     'Th12',
   ],
 }
+
 interface AuctionData {
   auctionName: string;
   numberOfUser: number;
@@ -60,7 +71,8 @@ const Dashboard = () => {
   const [chartData, setChartData] = useState([])
   const [auctionData, setAuctionData] = useState<any>(null)
   const [auctionData1, setAuctionData1] = useState<AuctionData[]>([]);
-
+  const [transactionData, setTransactionData] = useState<TransactionData[]>([]);
+  const [bidding, setBidding] = useState<any>(null)
   useEffect(() => {
     const postCountsByMonth = countPostsByMonth(posts, data.range)
     setChartData(postCountsByMonth)
@@ -74,6 +86,7 @@ const Dashboard = () => {
       setLoading(true)
       const response = await apiGetStakingList<any, any>({})
       const response2 = await apiGetPostList<any, any>({})
+
       setUser(response.data.result)
       setPosts(response2.data.result)
 
@@ -102,8 +115,43 @@ const Dashboard = () => {
   }
 
   useEffect(() => {
+    fetchTransactionData()
+  }, [])
+
+  const fetchTransactionData = async () => {
+    try {
+      setLoading(true);
+      const response = await apiGetTransactionState<any, any>({});
+      console.log("Transaction Data:", response.data.result);
+      setTransactionData(response.data.result);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.error("Error fetching transaction data:", error);
+    }
+  }
+  
+  useEffect(() => {
+    fetchBiddingData()
+  }, [])
+
+  const fetchBiddingData = async () => {
+    try {
+      // Make API call to get transaction data
+      const response = await apiGetBiddingState<any, any>({});
+      console.log("Bidding Data:", response.data);
+      setBidding(response.data.result);
+      setLoading(false)
+    } catch (error) {
+      setLoading(false)
+      console.error("Error fetching bidding data:", error);
+    }
+  }
+
+  useEffect(() => {
     fetchData()
   }, [])
+
   interface ApiResponse {
     isError: boolean;
     message: string;
@@ -127,6 +175,25 @@ const Dashboard = () => {
       console.error("Error fetching auction data:", error)
     }
   }
+
+  const getMonthNumberFromString = (monthString: string): number => {
+    
+    // Split the string by space
+    
+    const parts = monthString.split(' ');
+    
+    // Get the month part from the split string
+    const monthName = parts[0];
+  
+    // Create a date object with the provided month name
+    const date = new Date(monthName + ' 1, 2024');
+  
+    // Get the month number (0 to 11) from the date object
+    const monthNumber = date.getMonth();
+  
+    // Return the month number
+    return monthNumber;
+  };
 
   return (
     <div className="w-full">
@@ -230,6 +297,44 @@ const Dashboard = () => {
                 },
               ]}
               xAxis={['Coming Up', 'In Progress', 'Finished', 'Succeeded', 'Failed']}
+              type="bar"
+              customOptions={{
+                colors: ['#FF5733', '#33FF57', '#337FFF', '#FF3333'],
+                legend: { show: false },
+              }}
+            />
+          </Card>
+
+          <Card>
+            <h6 className="font-semibold mb-4 text-sm">Giao dịch trong năm</h6>
+            <Chart
+              series={[
+                {
+                  name: 'Transaction',
+                  data: transactionData.map(item => item.numberOfTransaction),
+                },
+              ]}
+              xAxis={transactionData.map(item => "Th" + (getMonthNumberFromString(item?.month) + 1))}
+              type="bar"
+              customOptions={{
+                colors: ['#FF5733'], // Adjust color as needed
+                legend: { show: false },
+              }}
+            />
+          </Card>
+
+          <Card>
+            <h6 className="font-semibold mb-4 text-sm">Đấu Giá Trong Năm</h6>
+            <Chart
+              series={[
+                {
+                  name: 'Bidding',
+                  data: [
+                    bidding?.numberOfUser || 0
+                  ],
+                },
+              ]}
+              xAxis={data.range}
               type="bar"
               customOptions={{
                 colors: ['#FF5733', '#33FF57', '#337FFF', '#FF3333'],

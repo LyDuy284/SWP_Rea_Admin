@@ -59,17 +59,25 @@ const AutionListTable = () => {
         },
       },
       {
-        header: 'Auction',
+        header: 'Đấu giá',
         cell: (props) => {
           const row = props.row.original
           return <span className="line-clamp-1 max-w-[300px]">{row.auction.name}</span>
         },
       },
       {
-        header: 'Transaction',
+        header: 'Phương thức thanh toán',
         cell: (props) => {
           const row = props.row.original
           return <span className="line-clamp-1 max-w-[300px]">{row.transactionType.name}</span>
+        },
+      },
+      {
+        header: 'Ngày bắt đầu',
+        // sortable: false,
+        cell: (props) => {
+          const row = props.row.original
+          return new Date(row?.createdAt).toLocaleDateString()
         },
       },
       {
