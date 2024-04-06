@@ -55,7 +55,8 @@ const AutionListTable = () => {
         header: 'Giá',
         cell: (props) => {
           const row = props.row.original
-          return <span className="line-clamp-1 max-w-[300px]">{row.amount}</span>
+          const formattedAmount = row.amount.toLocaleString();
+          return <span className="line-clamp-1 max-w-[300px]">{formattedAmount} VNĐ</span>
         },
       },
       {
@@ -66,7 +67,7 @@ const AutionListTable = () => {
         },
       },
       {
-        header: 'Phương thức thanh toán',
+        header: 'Hình thức thanh toán',
         cell: (props) => {
           const row = props.row.original
           return <span className="line-clamp-1 max-w-[300px]">{row.transactionType.name}</span>
@@ -84,7 +85,13 @@ const AutionListTable = () => {
         header: 'Trạng thái',
         cell: (props) => {
           const row = props.row.original
-          return row.transactionStatus || '--'
+          const statusMapping: { [key: number]: string } = {
+            0: 'Unpaid',
+            1: 'Paid',
+            
+          };
+          const status = statusMapping[row.transactionStatus] || '--';
+          return status;
         },
       },
       

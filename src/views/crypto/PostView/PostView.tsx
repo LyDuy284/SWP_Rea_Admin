@@ -82,7 +82,7 @@ const PostView = () => {
             <h6>
               Giá:{' '}
               <span className="opacity-80">
-                {post?.propertyRevervePrice} VND
+                {post?.propertyRevervePrice.toLocaleString()} VND
               </span>
             </h6>
             <h6>

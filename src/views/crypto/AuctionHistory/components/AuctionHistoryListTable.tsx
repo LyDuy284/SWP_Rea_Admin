@@ -27,7 +27,7 @@ const AuctionHistoryListTable = () => {
     setAutionsHistory(data.result)
   }
 
-  
+
   console.log(autionsHistory)
 
   const columns: ColumnDef<any>[] = useMemo(
@@ -49,12 +49,20 @@ const AuctionHistoryListTable = () => {
       {
         header: 'Giá',
         cell: (props) => {
-          const row = props.row.original
-          return <span className="line-clamp-1 max-w-[300px]">{row.biddingAmount}</span>
+          const row = props.row.original;
+          const formattedBiddingAmount = row.biddingAmount.toLocaleString();
+          return <span className="line-clamp-1 max-w-[300px]">{formattedBiddingAmount} VNĐ</span>;
         },
       },
-      
-    
+      {
+        header: 'Ngày',
+        // sortable: false,
+        cell: (props) => {
+          const row = props.row.original
+          return new Date(row?.createdAt).toLocaleDateString()
+        },
+      },
+
     ],
     []
   )

@@ -63,11 +63,11 @@ const AutionView = () => {
             </h6>
             <h6>
               Giá niêm yết:{' '}
-              <span className="opacity-80">{post?.finalPrice} VND</span>
+              <span className="opacity-80">{post?.finalPrice.toLocaleString()} VND</span>
             </h6>
             <h6>
               Giá khởi điểm:{' '}
-              <span className="opacity-80">{post?.revervePrice} VND</span>
+              <span className="opacity-80">{post?.revervePrice.toLocaleString()} VND</span>
             </h6>
             <h6>
               Thời gian bắt đầu:{' '}

@@ -15,7 +15,7 @@ export async function apiGetTransferById<T, U extends Record<string, unknown>>(
     return data.result
   }
 
-  export async function apiApproveTransfer<T, U extends Record<string, unknown>>(
+export async function apiApproveTransfer<T, U extends Record<string, unknown>>(
     params: U
   ) {
     const { data } = await ApiService.fetchData<any>({
@@ -25,7 +25,7 @@ export async function apiGetTransferById<T, U extends Record<string, unknown>>(
     return data.result
   }
 
-  export async function apiRejectTransfer(params: RejectTransferParams) {
+export async function apiRejectTransfer(params: RejectTransferParams) {
     if (typeof params.id === 'undefined') {
       throw new Error('Invalid ID'); // Handle the case where ID is undefined
     }
@@ -36,4 +36,14 @@ export async function apiGetTransferById<T, U extends Record<string, unknown>>(
       data: { reason: params.reason }, // Include the reason in the request payload
     });
     return data.result;
+  }
+  
+  export async function apiDoneTransfer<T, U extends Record<string, unknown>>(
+    params: U
+  ) {
+    const { data } = await ApiService.fetchData<any>({
+      url: `/TransferForm/done?formId=${params.id}`,
+      method: 'patch',
+    })
+    return data.result
   }

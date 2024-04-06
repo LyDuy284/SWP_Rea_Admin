@@ -77,7 +77,16 @@ const TransferListTable = () => {
         header: 'Trạng thái',
         cell: (props) => {
           const row = props.row.original;
-          return row.tranferFormStatus || '--';
+          const statusMapping: { [key: number]: string } = {
+            0: 'Draft',
+            1: 'Requesting',
+            2: 'Rejected',
+            3: 'Approved',
+            4: 'PaymentComplete',
+            5: 'Done'
+          };
+          const status = statusMapping[row.tranferFormStatus] || '--';
+          return status;
         },
       },
       {
@@ -99,7 +108,11 @@ const TransferListTable = () => {
     ],
     []
   );
-
+  const totalItem: any = {
+    size: transfers.length,
+    page: 1,
+    count: transfers.length,
+  }
   return (
     <>
       <DataTable
@@ -108,6 +121,7 @@ const TransferListTable = () => {
         data={transfers}
         skeletonAvatarColumns={[0]}
         skeletonAvatarProps={{ className: 'rounded-md' }}
+        pagingData={totalItem}
         disabledPaginate
       />
     </>

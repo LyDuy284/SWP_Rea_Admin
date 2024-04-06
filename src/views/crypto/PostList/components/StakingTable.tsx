@@ -137,11 +137,19 @@ const StakingTable = () => {
       },
       {
         header: 'Trạng thái',
-        cell: (props) => {
-          const row = props.row.original
-          return row.postStatus || '--'
+        cell: (props: { row: { original: { postStatus: number } } }) => {
+          const row = props.row.original;
+          const statusMapping: { [key: number]: string } = {
+            0: 'Draft',
+            1: 'Requesting',
+            2: 'Rejected',
+            3: 'Approved',
+            4: 'Completed'
+          };
+          const status = statusMapping[row.postStatus] || '--';
+          return status;
         },
-      },
+      },  
       {
         header: 'Người đăng ',
         // sortable: false,

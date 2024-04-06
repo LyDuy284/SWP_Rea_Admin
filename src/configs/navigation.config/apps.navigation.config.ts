@@ -80,7 +80,7 @@ const appsNavigationConfig: NavigationTree[] = [
         key: 'apps.auctionhistory',
         path: `${APP_PREFIX_PATH}/auctionhistory`,
         title: 'Lịch sử đấu giá',
-        translateKey: 'Auction History',
+        translateKey: 'Lịch Sử',
         icon: 'aution',
         type: NAV_ITEM_TYPE_ITEM,
         authority: [],

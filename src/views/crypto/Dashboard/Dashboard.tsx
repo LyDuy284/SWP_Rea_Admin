@@ -64,6 +64,10 @@ interface AuctionData {
   auctionName: string;
   numberOfUser: number;
 }
+interface BiddingData {
+  auctionName: string;
+  highestBidding:number;
+}
 const Dashboard = () => {
   const [users, setUser] = useState([])
   const [posts, setPosts] = useState([])
@@ -72,7 +76,7 @@ const Dashboard = () => {
   const [auctionData, setAuctionData] = useState<any>(null)
   const [auctionData1, setAuctionData1] = useState<AuctionData[]>([]);
   const [transactionData, setTransactionData] = useState<TransactionData[]>([]);
-  const [bidding, setBidding] = useState<any>(null)
+  const [bidding, setBidding] = useState<BiddingData[]>([])
   useEffect(() => {
     const postCountsByMonth = countPostsByMonth(posts, data.range)
     setChartData(postCountsByMonth)
@@ -311,7 +315,7 @@ const Dashboard = () => {
               series={[
                 {
                   name: 'Transaction',
-                  data: transactionData.map(item => item.numberOfTransaction),
+                  data: transactionData.map(item => item.totalTransactionAmount),
                 },
               ]}
               xAxis={transactionData.map(item => "Th" + (getMonthNumberFromString(item?.month) + 1))}
@@ -329,12 +333,11 @@ const Dashboard = () => {
               series={[
                 {
                   name: 'Bidding',
-                  data: [
-                    bidding?.numberOfUser || 0
-                  ],
+                  data:  bidding.map(bidding1 => bidding1.highestBidding),
+                  
                 },
               ]}
-              xAxis={data.range}
+              xAxis={bidding.map(bidding1 => bidding1.auctionName)}
               type="bar"
               customOptions={{
                 colors: ['#FF5733', '#33FF57', '#337FFF', '#FF3333'],

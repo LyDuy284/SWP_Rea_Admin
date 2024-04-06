@@ -68,7 +68,15 @@ const AutionListTable = () => {
         header: 'Trạng thái',
         cell: (props) => {
           const row = props.row.original
-          return row.auctionStatus || '--'
+          const statusMapping: { [key: number]: string } = {
+            0: 'Coming up',
+            1: 'In Progress',
+            2: 'Finished',
+            3: 'Succeeded',
+            4: 'Failed'
+          };
+          const status = statusMapping[row.auctionStatus] || '--';
+          return status;
         },
       },
       {
